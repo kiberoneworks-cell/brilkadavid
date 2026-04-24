@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Casino Royale — Джекпот Спин</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at 20% 30%, #0a2f2a, #030c0a);
+            font-family: 'Segoe UI', 'Poppins', 'Playfair Display', 'Georgia', serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Главный контейнер казино */
+        .casino-container {
+            background: #1a2a24cc;
+            backdrop-filter: blur(4px);
+            border-radius: 72px;
+            padding: 25px 30px 35px;
+            box-shadow: 0 30px 45px rgba(0,0,0,0.6), inset 0 1px 3px rgba(255,215,0,0.3);
+            border: 1px solid rgba(255, 200, 80, 0.5);
+        }
+
+        /* Игровое поле */
+        .game-panel {
+            background: #0f1915;
+            border-radius: 48px;
+            padding: 20px;
+            box-shadow: inset 0 0 15px #00000055, 0 12px 25px black;
+        }
+
+        /* слот-машина */
+        .slot-machine {
+            background: #2c2118;
+            border-radius: 50px;
+            padding: 25px 20px;
+            background-image: repeating-linear-gradient(45deg, #3e2c1f22 0px, #3e2c1f22 2px, #5a3f2a22 2px, #5a3f2a22 8px);
+            border: 2px solid #dbb45c;
+            box-shadow: 0 8px 0 #5a3a1a;
+        }
+
+        .reels {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-bottom: 35px;
+        }
+
+        .reel {
+            background: #fef3da;
+            width: 130px;
+            height: 150px;
+            border-radius: 28px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 0 3px #ffeaaf, 0 12px 20px rgba(0,0,0,0.4);
+            background: linear-gradient(145deg, #fff2dd, #ffe2b5);
+            transition: all 0.1s ease;
+        }
+
+        .reel span {
+            font-size: 85px;
+            font-weight: bold;
+            text-shadow: 3px 3px 0 #b97f2e;
+            transform: scale(1);
+            display: inline-block;
+        }
+
+        .reel-label {
+            font-family: monospace;
+            font-weight: bold;
+            color: #a55217;
+            margin-top: 8px;
+            background: #2a1c0e80;
+            padding: 3px 12px;
+            border-radius: 40px;
+            font-size: 14px;
+        }
+
+        /* Инфо-панель */
+        .info-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            background: #030e0bbb;
+            border-radius: 80px;
+            padding: 10px 25px;
+            margin-top: 15px;
+            backdrop-filter: blur(8px);
+        }
+
+        .balance-box {
+            background: #000000aa;
+            padding: 5px 20px;
+            border-radius: 60px;
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        .balance-label {
+            color: #ffcd94;
+            font-size: 15px;
+            letter-spacing: 2px;
+        }
+
+        .balance-value {
+            font-size: 42px;
+            font-weight: 800;
+            color: #ffd966;
+            text-shadow: 0 0 5px #ff9900;
+            line-height: 1;
+        }
+
+        .last-win {
+            background: #00000099;
+            padding: 8px 24px;
+            border-radius: 50px;
+            text-align: center;
+        }
+
+        .last-win span:first-child {
+            color: #ffbf69;
+            font-size: 13px;
+        }
+
+        .win-amount {
+            font-size: 28px;
+            font-weight: bold;
+            color: #f5bc70;
+        }
+
+        button {
+            background: radial-gradient(circle at 30% 10%, #f5bc70, #d18f2c);
+            border: none;
+            font-family: 'Segoe UI', 'Poppins', sans-serif;
+            font-weight: bold;
+            font-size: 28px;
+            padding: 14px 35px;
+            border-radius: 80px;
+            color: #2c1a0a;
+            cursor: pointer;
+            transition: 0.07s linear;
+            box-shadow: 0 8px 0 #7a3e12;
+            letter-spacing: 3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+        button:active {
+            transform: translateY(4px);
+            box-shadow: 0 3px 0 #7a3e12;
+        }
+        button:disabled {
+            opacity: 0.6;
+            transform: translateY(0);
+            cursor: not-allowed;
+        }
+
+        .bet-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #0f211cee;
+            padding: 5px 18px;
+            border-radius: 60px;
+        }
+        .bet-control label {
+            color: #ffdd99;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .bet-input {
+            background: #ffecb3;
+            border: none;
+            font-size: 24px;
+            width: 100px;
+            text-align: center;
+            font-weight: bold;
+            border-radius: 60px;
+            padding: 5px 0;
+            font-family: monospace;
+        }
+        .adjust-bet {
+            background: #37200e;
+            color: #ffcd94;
+            font-size: 26px;
+            font-weight: bold;
+            width: 44px;
+            border-radius: 40px;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.05s linear;
+            box-shadow: inset 0 1px 2px #ffcf8a, 0 2px 3px black;
+        }
+        .adjust-bet:active {
+            transform: scale(0.94);
+        }
+
+        .history {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            background: #030f0caa;
+            border-radius: 60px;
+            padding: 12px 20px;
+        }
+        .history span {
+            background: #2b1b0e;
+            padding: 8px 14px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 18px;
+            color: #ffc285;
+        }
+
+        .jackpot-light {
+            font-size: 18px;
+            background: #bc7a2e;
+            color: gold;
+            padding: 4px 15px;
+            border-radius: 30px;
+            font-weight: bold;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { text-shadow: 0 0 0 gold; opacity: 0.9;}
+            100% { text-shadow: 0 0 8px rgb(255, 215, 0); opacity: 1;}
+        }
+        @media (max-width: 780px) {
+            .reel { width: 90px; height: 110px; }
+            .reel span { font-size: 58px; }
+            button { font-size: 22px; padding: 10px 22px;}
+            .balance-value { font-size: 32px; }
+        }
+    </style>
+</head>
+<body>
+<div class="casino-container">
+    <div class="game-panel">
+        <div class="slot-machine">
+            <div class="reels" id="reelsContainer">
+                <!-- три барабана, создадим динамически через js, но для структуры разместим -->
+            </div>
+            <div style="display: flex; justify-content: center; margin-bottom: 15px;">
+                <div class="jackpot-light" id="jackpotLight">💎 JACKPOT MODE 💎</div>
+            </div>
+            <div class="info-area">
+                <div class="balance-box">
+                    <div class="balance-label">💰 БАЛАНС</div>
+                    <div class="balance-value" id="balanceDisplay">1000</div>
+                </div>
+                <div class="bet-control">
+                    <label>⚡ СТАВКА</label>
+                    <div class="adjust-bet" id="betDown">-</div>
+                    <input type="number" id="betAmount" class="bet-input" value="50" step="10" min="10">
+                    <div class="adjust-bet" id="betUp">+</div>
+                </div>
+                <div class="last-win">
+                    <span>🏆 ПОСЛЕДНИЙ ВЫИГРЫШ</span><br>
+                    <span class="win-amount" id="lastWinAmount">0</span>
+                </div>
+                <button id="spinBtn">🎰 SPIN</button>
+            </div>
+            <div class="history" id="historyList">
+                <span>✨ Жми SPIN ✨</span>
+            </div>
+        </div>
+    </div>
+    <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #ffd58c;">
+        🎲 Комбинации: 🍒 Cherry | 💎 Diamond | 🍊 Orange | 7️⃣ Seven | 🎰 Jackpot (три 7)
+    </div>
+</div>
+
+<script>
+    (function(){
+        // ---------- СИМВОЛЫ КАЗИНО ----------
+        const SYMBOLS = [
+            { id: 'cherry',  emoji: '🍒',  name: 'Cherry',  value: 5,   multiplier: 2 },
+            { id: 'diamond', emoji: '💎',  name: 'Diamond', value: 12,  multiplier: 3 },
+            { id: 'orange',  emoji: '🍊',  name: 'Orange',  value: 7,   multiplier: 2.5 },
+            { id: 'seven',   emoji: '7️⃣',   name: 'Seven',   value: 25,  multiplier: 5 },
+            { id: 'jackpot', emoji: '🎰',  name: 'Jackpot', value: 100, multiplier: 10 }
+        ];
+        
+        // карта для быстрого доступа
+        const symMap = {
+            '🍒': SYMBOLS[0], '💎': SYMBOLS[1], '🍊': SYMBOLS[2], '7️⃣': SYMBOLS[3], '🎰': SYMBOLS[4]
+        };
+        
+        let balance = 1000;          // стартовый баланс
+        let currentBet = 50;         // ставка
+        let spinning = false;         // блокировка во время вращения
+        let lastWin = 0;
+        let historyLog = [];          // последние 5 выигрышей/комбинаций
+        
+        // текущие символы на реклах (для отрисовки)
+        let currentSymbols = ['🍒', '💎', '🍊']; // стартовые
+        
+        // DOM элементы
+        const reelsContainer = document.getElementById('reelsContainer');
+        const balanceDisplay = document.getElementById('balanceDisplay');
+        const betAmountInput = document.getElementById('betAmount');
+        const spinBtn = document.getElementById('spinBtn');
+        const lastWinAmountSpan = document.getElementById('lastWinAmount');
+        const historyListDiv = document.getElementById('historyList');
+        const betDownBtn = document.getElementById('betDown');
+        const betUpBtn = document.getElementById('betUp');
+        const jackpotLightSpan = document.getElementById('jackpotLight');
+        
+        // Обновление отображения баланса
+        function updateBalanceUI(){
+            balanceDisplay.innerText = Math.floor(balance);
+            if(balance <= 0){
+                spinBtn.disabled = true;
+                spinBtn.style.opacity = '0.6';
+                spinBtn.innerText = '💔 NO MONEY';
+            } else {
+                spinBtn.disabled = false;
+                spinBtn.innerText = '🎰 SPIN';
+                spinBtn.style.opacity = '1';
+            }
+        }
+        
+        // Добавить запись в историю
+        function addHistory(message, winAmount = 0){
+            let text = winAmount > 0 ? `✨ +${winAmount} ✨` : message;
+            if(winAmount > 0) text = `🎲 ${message} → +${winAmount}`;
+            else text = `❌ ${message}`;
+            historyLog.unshift(text);
+            if(historyLog.length > 6) historyLog.pop();
+            renderHistory();
+        }
+        
+        function renderHistory(){
+            historyListDiv.innerHTML = '';
+            historyLog.forEach(entry => {
+                const span = document.createElement('span');
+                span.innerText = entry;
+                historyListDiv.appendChild(span);
+            });
+            if(historyLog.length === 0){
+                historyListDiv.innerHTML = '<span>✨ Жми SPIN ✨</span>';
+            }
+        }
+        
+        // вычисление выигрыша по трём символам
+        function calculateWin(symbolsArray, bet){
+            // symbolsArray: массив из 3 эмодзи
+            const [s1, s2, s3] = symbolsArray;
+            // джекпот: три семёрки = особый приз
+            if(s1 === '7️⃣' && s2 === '7️⃣' && s3 === '7️⃣'){
+                const jackpotWin = bet * 25;
+                return { win: jackpotWin, type: '🔥 JACKPOT 777 🔥', multiplier: 25 };
+            }
+            // три одинаковых символа
+            if(s1 === s2 && s2 === s3){
+                const sym = symMap[s1];
+                if(sym){
+                    const winAmount = Math.floor(bet * sym.multiplier);
+                    return { win: winAmount, type: `ТРИ ${sym.name} ! x${sym.multiplier}`, multiplier: sym.multiplier };
+                }
+            }
+            // две одинаковые (любые два)
+            if(s1 === s2 || s2 === s3 || s1 === s3){
+                let matchedSym = null;
+                if(s1 === s2) matchedSym = s1;
+                else if(s2 === s3) matchedSym = s2;
+                else if(s1 === s3) matchedSym = s1;
+                const symData = symMap[matchedSym];
+                if(symData){
+                    const winAmount = Math.floor(bet * (symData.multiplier * 0.65));
+                    return { win: winAmount, type: `ПАРА ${symData.name} x${(symData.multiplier*0.65).toFixed(1)}`, multiplier: symData.multiplier*0.65 };
+                }
+            }
+            // специальный бонус: три разных, но есть комбинация '🍒💎🍊' - маленький бонус
+            if(s1 === '🍒' && s2 === '💎' && s3 === '🍊'){
+                const bonus = Math.floor(bet * 1.8);
+                return { win: bonus, type: '🍒💎🍊 LUCKY FRUIT', multiplier: 1.8 };
+            }
+            return { win: 0, type: 'no win', multiplier: 0 };
+        }
+        
+        // Анимация "вращения" каждого барабана с случайной генерацией
+        async function spinReelsAnimation(finalSymbols){
+            // finalSymbols - итоговые три символа
+            const reelElements = document.querySelectorAll('.reel');
+            if(!reelElements.length) return;
+            
+            const spinDuration = 450; // ms
+            const steps = 12; // кол-во смен символов
+            const intervalTime = spinDuration / steps;
+            
+            // для каждого реала независимо: прокрутка
+            const promises = [];
+            for(let i=0; i<reelElements.length; i++){
+                const reelDiv = reelElements[i];
+                const finalSym = finalSymbols[i];
+                const spanElem = reelDiv.querySelector('.reel-symbol');
+                promises.push(new Promise((resolve) => {
+                    let step = 0;
+                    const interval = setInterval(() => {
+                        // случайный символ из всех доступных для эффекта "вертушки"
+                        const randomSym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)].emoji;
+                        if(spanElem) spanElem.innerText = randomSym;
+                        step++;
+                        if(step >= steps){
+                            clearInterval(interval);
+                            if(spanElem) spanElem.innerText = finalSym;
+                            resolve();
+                        }
+                    }, intervalTime);
+                }));
+            }
+            await Promise.all(promises);
+        }
+        
+        // Генерация случайной комбинации (честная, но с весами, чтобы джекпот был редким)
+        function getRandomSymbol() {
+            const r = Math.random() * 100;
+            if (r < 2) return '🎰';      // 2% джекпот-символ
+            if (r < 15) return '7️⃣';    // 13% семерка
+            if (r < 35) return '💎';     // 20% бриллиант
+            if (r < 65) return '🍊';     // 30% апельсин
+            return '🍒';                  // остальное вишня
+        }
+        
+        function getRandomCombination(){
+            return [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()];
+        }
+        
+        // Основная функция игры
+        async function performSpin(){
+            if(spinning) {
+                addHistory("Подождите, вращение уже идет!", 0);
+                return;
+            }
+            let bet = parseInt(betAmountInput.value);
+            if(isNaN(bet) || bet <= 0) bet = 10;
+            if(bet > balance){
+                addHistory("Не хватает денег! Уменьшите ставку", 0);
+                return;
+            }
+            if(balance <= 0){
+                addHistory("Баланс нулевой! Обновите страницу для рестарта (или F5)", 0);
+                return;
+            }
+            
+            spinning = true;
+            spinBtn.disabled = true;
+            
+            // списываем ставку
+            balance -= bet;
+            updateBalanceUI();
+            
+            // Генерируем результат
+            const newSymbols = getRandomCombination();
+            
+            // Анимация вращения
+            await spinReelsAnimation(newSymbols);
+            
+            // Обновляем текущие символы
+            currentSymbols = [...newSymbols];
+            
+            // Вычисляем выигрыш
+            const result = calculateWin(currentSymbols, bet);
+            let winAmount = result.win;
+            let message = result.type;
+            
+            // Дополнительный джекпотный световой эффект если три семерки
+            const isJackpotTripleSeven = (currentSymbols[0] === '7️⃣' && currentSymbols[1] === '7️⃣' && currentSymbols[2] === '7️⃣');
+            if(isJackpotTripleSeven){
+                winAmount = bet * 25;
+                message = "🌟🌟🌟 JACKPOT 777 !!! 🌟🌟🌟";
+                // спец эффект
+                jackpotLightSpan.style.animation = 'none';
+                setTimeout(()=> jackpotLightSpan.style.animation = 'pulse 0.5s infinite', 10);
+                // дополнительная вспышка
+                document.body.style.transition = '0.1s';
+                document.body.style.backgroundColor = '#ffbb33aa';
+                setTimeout(()=> document.body.style.backgroundColor = '', 200);
+            } else {
+                jackpotLightSpan.style.animation = 'pulse 1s infinite';
+            }
+            
+            if(winAmount > 0){
+                balance += winAmount;
+                lastWin = winAmount;
+                lastWinAmountSpan.innerText = winAmount;
+                addHistory(`${message}`, winAmount);
+                // визуальный фидбек
+                const reelDivs = document.querySelectorAll('.reel');
+                for(let i=0;i<reelDivs.length;i++){
+                    reelDivs[i].style.transform = 'scale(1.02)';
+                    setTimeout(()=>{ if(reelDivs[i]) reelDivs[i].style.transform = ''; }, 150);
+                }
+            } else {
+                lastWin = 0;
+                lastWinAmountSpan.innerText = "0";
+                addHistory(`Проигрыш: ${currentSymbols.join(' ')}`, 0);
+            }
+            
+            updateBalanceUI();
+            
+            // если баланс упал до нуля, дополнительное сообщение
+            if(balance <= 0){
+                addHistory("💀 Банкрот! Перезагрузите игру для новой попытки 💀", 0);
+                spinBtn.disabled = true;
+            }
+            
+            spinning = false;
+            spinBtn.disabled = (balance <= 0);
+        }
+        
+        // построить UI барабанов
+        function buildReels(){
+            reelsContainer.innerHTML = '';
+            for(let i=0;i<3;i++){
+                const reelDiv = document.createElement('div');
+                reelDiv.className = 'reel';
+                const symbolSpan = document.createElement('span');
+                symbolSpan.className = 'reel-symbol';
+                symbolSpan.innerText = currentSymbols[i] || '🍒';
+                const labelSpan = document.createElement('div');
+                labelSpan.className = 'reel-label';
+                labelSpan.innerText = ['ЛЕВЫЙ','ЦЕНТР','ПРАВЫЙ'][i];
+                reelDiv.appendChild(symbolSpan);
+                reelDiv.appendChild(labelSpan);
+                reelsContainer.appendChild(reelDiv);
+            }
+        }
+        
+        // обновить отображение символов на релах без анимации (для ресета)
+        function syncReelsUI(){
+            const symbolsSpans = document.querySelectorAll('.reel-symbol');
+            for(let i=0;i<symbolsSpans.length && i<currentSymbols.length;i++){
+                if(symbolsSpans[i]) symbolsSpans[i].innerText = currentSymbols[i];
+            }
+        }
+        
+        // установка ставки
+        function setBet(value){
+            let newBet = Math.min(Math.max(value, 10), balance > 0 ? balance : 1000);
+            if(balance > 0 && newBet > balance) newBet = balance;
+            if(newBet < 10) newBet = 10;
+            currentBet = newBet;
+            betAmountInput.value = currentBet;
+        }
+        
+        // сброс игры (для удобства, но без кнопки, можно скрытый ресет по двойному клику)
+        function resetGameFull(){
+            balance = 1000;
+            currentSymbols = ['🍒','💎','🍊'];
+            syncReelsUI();
+            lastWin = 0;
+            lastWinAmountSpan.innerText = "0";
+            historyLog = [];
+            renderHistory();
+            updateBalanceUI();
+            setBet(50);
+            addHistory("Игра перезапущена! Добро пожаловать в казино", 0);
+            spinning = false;
+            spinBtn.disabled = false;
+            jackpotLightSpan.style.animation = 'pulse 1s infinite';
+        }
+        
+        // событие настройки ставки
+        betDownBtn.addEventListener('click', () => {
+            if(spinning) return;
+            let current = parseInt(betAmountInput.value);
+            let newVal = Math.max(10, current - 10);
+            setBet(newVal);
+        });
+        betUpBtn.addEventListener('click', () => {
+            if(spinning) return;
+            let current = parseInt(betAmountInput.value);
+            let maxBet = balance > 0 ? balance : 1000;
+            let newVal = Math.min(maxBet, current + 10);
+            setBet(newVal);
+        });
+        betAmountInput.addEventListener('change', () => {
+            let val = parseInt(betAmountInput.value);
+            if(isNaN(val)) val = 10;
+            if(balance > 0 && val > balance) val = balance;
+            setBet(val);
+        });
+        
+        spinBtn.addEventListener('click', () => {
+            performSpin();
+        });
+        
+        // дополнительный скрытый сброс: двойной клик по лого джекпота
+        jackpotLightSpan.addEventListener('dblclick', () => {
+            if(confirm("Перезапустить игру с балансом 1000?")){
+                resetGameFull();
+            }
+        });
+        
+        // инициализация
+        function init(){
+            buildReels();
+            updateBalanceUI();
+            setBet(50);
+            addHistory("Добро пожаловать в Casino Royale! Крутите барабаны", 0);
+            lastWinAmountSpan.innerText = "0";
+            // добавим пару тестовых записей для красоты
+            setTimeout(() => {
+                if(historyLog.length === 1) addHistory("🍒🍒🍒 Удачи!", 0);
+            }, 500);
+        }
+        
+        init();
+    })();
+</script>
+</body>
+</html>
